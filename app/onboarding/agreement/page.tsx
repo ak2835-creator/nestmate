@@ -216,8 +216,8 @@ export default function AgreementWizardPage() {
             </div>
             {[
               { initials: "AY", name: "Aya (you)", bg: "#F0DDD3", color: "#8B4A2E", done: true },
-              { initials: "JD", name: "Jordan", bg: "#D8EBE0", color: "#4A7C5F", done: false },
-              { initials: "PR", name: "Priya", bg: "#E8E0F8", color: "#5534B7", done: false },
+              { initials: "JD", name: "Jordan",    bg: "#D8EBE0", color: "#4A7C5F", done: true },
+              { initials: "PR", name: "Priya",     bg: "#E8E0F8", color: "#5534B7", done: false },
             ].map((m) => (
               <div
                 key={m.initials}
@@ -243,7 +243,7 @@ export default function AgreementWizardPage() {
               </div>
             ))}
             <p className="text-[12px] text-nm-muted mt-3 leading-relaxed">
-              Results and any conflicts will appear once all 3 have submitted.
+              2 of 3 submitted. Results appear once all 3 are in.
             </p>
           </div>
 
