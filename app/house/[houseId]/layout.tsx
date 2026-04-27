@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { TabNav } from "./TabNav";
 import HouseHeader from "./HouseHeader";
 
@@ -15,15 +14,8 @@ export default async function HouseLayout({
     <div className="min-h-screen bg-nm-sand flex flex-col">
       {/* House header */}
       <div className="bg-nm-white" style={{ borderBottom: "1px solid rgba(44,36,22,0.1)" }}>
-        <div className="px-5 pt-4 pb-0 flex items-start justify-between">
-          <HouseHeader />
-          <Link
-            href={`/house/${houseId}/pulse`}
-            className="text-[12px] font-medium px-2.5 py-1 rounded-full mt-0.5 transition-opacity hover:opacity-75"
-            style={{ background: "#D8EBE0", color: "#4A7C5F" }}
-          >
-            Pulse: Good
-          </Link>
+        <div className="px-5 pt-4 pb-0">
+          <HouseHeader houseId={houseId} />
         </div>
         <TabNav houseId={houseId} />
       </div>
