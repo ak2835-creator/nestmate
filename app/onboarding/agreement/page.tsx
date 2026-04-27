@@ -266,7 +266,10 @@ export default function AgreementWizardPage() {
 
         <div className="px-6 pb-10 pt-4">
           <button
-            onClick={() => router.push("/house/demo")}
+            onClick={() => {
+              localStorage.setItem("nm_agreement_submitted", "true");
+              router.push("/house/demo");
+            }}
             className="w-full py-4 bg-nm-terra text-white rounded-xl font-medium text-[16px] hover:bg-nm-terra-dark transition-colors"
           >
             Go to your house →

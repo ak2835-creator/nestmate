@@ -1,6 +1,9 @@
-import Link from "next/link";
+"use client";
 
-const MEMBERS = [
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+const BASE_MEMBERS = [
   { initials: "AY", name: "Aya (you)", bg: "#F0DDD3", color: "#8B4A2E", submitted: true },
   { initials: "JD", name: "Jordan", bg: "#D8EBE0", color: "#4A7C5F", submitted: true },
   { initials: "PR", name: "Priya", bg: "#E8E0F8", color: "#5534B7", submitted: false },
@@ -16,8 +19,18 @@ const RATIFIED_CLAUSES = [
 ];
 
 export default function AgreementPage() {
-  const submitted = MEMBERS.filter((m) => m.submitted).length;
-  const total = MEMBERS.length;
+  const [allSubmitted, setAllSubmitted] = useState(false);
+
+  useEffect(() => {
+    setAllSubmitted(localStorage.getItem("nm_agreement_submitted") === "true");
+  }, []);
+
+  const members = allSubmitted
+    ? BASE_MEMBERS.map((m) => ({ ...m, submitted: true }))
+    : BASE_MEMBERS;
+
+  const submitted = members.filter((m) => m.submitted).length;
+  const total = members.length;
   const pct = Math.round((submitted / total) * 100);
 
   return (
@@ -44,11 +57,11 @@ export default function AgreementPage() {
 
         {/* Member rows */}
         <div>
-          {MEMBERS.map((m, i) => (
+          {members.map((m, i) => (
             <div
               key={m.initials}
               className="flex items-center gap-3 py-3"
-              style={i < MEMBERS.length - 1 ? { borderBottom: "1px solid rgba(44,36,22,0.06)" } : undefined}
+              style={i < members.length - 1 ? { borderBottom: "1px solid rgba(44,36,22,0.06)" } : undefined}
             >
               <div
                 className="w-9 h-9 rounded-full flex items-center justify-center text-[13px] font-semibold flex-shrink-0"
@@ -71,29 +84,43 @@ export default function AgreementPage() {
           ))}
         </div>
 
-        <div
-          className="mt-3 flex items-start gap-2 p-3 rounded-xl"
-          style={{ background: "#F5F0E8" }}
-        >
-          <span className="text-base">🔒</span>
-          <p className="text-[13px] text-nm-muted leading-relaxed">
-            Results and conflicts will appear once all {total} have submitted. Answers stay hidden to prevent anchoring.
-          </p>
-        </div>
+        {allSubmitted ? (
+          <div
+            className="mt-3 flex items-start gap-2 p-3 rounded-xl"
+            style={{ background: "#D8EBE0" }}
+          >
+            <span className="text-base">✓</span>
+            <p className="text-[13px] leading-relaxed" style={{ color: "#4A7C5F" }}>
+              All 3 submitted. Results revealed below.
+            </p>
+          </div>
+        ) : (
+          <div
+            className="mt-3 flex items-start gap-2 p-3 rounded-xl"
+            style={{ background: "#F5F0E8" }}
+          >
+            <span className="text-base">🔒</span>
+            <p className="text-[13px] text-nm-muted leading-relaxed">
+              Results and conflicts will appear once all {total} have submitted. Answers stay hidden to prevent anchoring.
+            </p>
+          </div>
+        )}
       </div>
 
-      {/* Haven't submitted yet CTA */}
-      <Link
-        href="/onboarding/agreement"
-        className="flex items-center justify-between px-5 py-4 rounded-2xl transition-colors"
-        style={{ background: "#C4714A", color: "white" }}
-      >
-        <div>
-          <div className="text-[12px] opacity-70 mb-0.5">your answers are needed</div>
-          <div className="text-[15px] font-medium">Fill out your portion →</div>
-        </div>
-        <span className="text-xl opacity-60">›</span>
-      </Link>
+      {/* CTA — only shown when user hasn't submitted */}
+      {!allSubmitted && (
+        <Link
+          href="/onboarding/agreement"
+          className="flex items-center justify-between px-5 py-4 rounded-2xl transition-colors"
+          style={{ background: "#C4714A", color: "white" }}
+        >
+          <div>
+            <div className="text-[12px] opacity-70 mb-0.5">your answers are needed</div>
+            <div className="text-[15px] font-medium">Fill out your portion →</div>
+          </div>
+          <span className="text-xl opacity-60">›</span>
+        </Link>
+      )}
 
       {/* Ratified clauses */}
       <div
