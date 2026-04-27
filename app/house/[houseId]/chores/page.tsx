@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Chore {
   id: number;
@@ -9,31 +9,35 @@ interface Chore {
   done: boolean;
 }
 
-const MEMBERS = ["Aya (you)", "Jordan", "Priya"];
+const OTHER_MEMBERS = ["Jordan", "Priya"] as const;
 
-const MEMBER_STYLES: Record<string, { bg: string; color: string; initials: string }> = {
-  "Aya (you)": { bg: "#F0DDD3", color: "#8B4A2E", initials: "AY" },
-  Jordan:      { bg: "#D8EBE0", color: "#4A7C5F", initials: "JD" },
-  Priya:       { bg: "#E8E0F8", color: "#5534B7", initials: "PR" },
+const BASE_STYLES: Record<string, { bg: string; color: string; initials: string }> = {
+  Jordan: { bg: "#D8EBE0", color: "#4A7C5F", initials: "JD" },
+  Priya:  { bg: "#E8E0F8", color: "#5534B7", initials: "PR" },
 };
 
 const INITIAL_CHORES: Chore[] = [
   { id: 1, name: "Kitchen cleaning", assignee: "Aya (you)", done: true },
-  { id: 2, name: "Take out trash", assignee: "Jordan", done: true },
-  { id: 3, name: "Bathroom", assignee: "Priya", done: false },
-  { id: 4, name: "Vacuuming", assignee: "Aya (you)", done: false },
-  { id: 5, name: "Common area tidy", assignee: "Jordan", done: false },
+  { id: 2, name: "Take out trash",    assignee: "Jordan",    done: true },
+  { id: 3, name: "Bathroom",          assignee: "Priya",     done: false },
+  { id: 4, name: "Vacuuming",         assignee: "Aya (you)", done: false },
+  { id: 5, name: "Common area tidy",  assignee: "Jordan",    done: false },
 ];
 
 function AddChoreModal({
+  youKey,
+  memberStyles,
   onClose,
   onAdd,
 }: {
+  youKey: string;
+  memberStyles: Record<string, { bg: string; color: string; initials: string }>;
   onClose: () => void;
   onAdd: (chore: Chore) => void;
 }) {
   const [name, setName] = useState("");
-  const [assignee, setAssignee] = useState("Aya (you)");
+  const [assignee, setAssignee] = useState(youKey);
+  const members = [youKey, ...OTHER_MEMBERS];
 
   function handleAdd() {
     if (!name.trim()) return;
@@ -44,7 +48,6 @@ function AddChoreModal({
   return (
     <div className="fixed inset-0 z-50 flex items-end" style={{ background: "rgba(44,36,22,0.4)" }}>
       <div className="w-full bg-nm-cream rounded-t-3xl" style={{ border: "1px solid rgba(44,36,22,0.1)" }}>
-        {/* Handle */}
         <div className="flex justify-center pt-3 pb-1">
           <div className="w-10 h-1 rounded-full" style={{ background: "rgba(44,36,22,0.15)" }} />
         </div>
@@ -83,8 +86,8 @@ function AddChoreModal({
               Assign to
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {MEMBERS.map((m) => {
-                const s = MEMBER_STYLES[m];
+              {members.map((m) => {
+                const s = memberStyles[m] ?? { bg: "#E7E3DE", color: "#6B6560", initials: m.slice(0, 2).toUpperCase() };
                 return (
                   <button
                     key={m}
@@ -130,6 +133,29 @@ export default function ChoresPage() {
   const [chores, setChores] = useState<Chore[]>(INITIAL_CHORES);
   const [showAddModal, setShowAddModal] = useState(false);
   const [manageMode, setManageMode] = useState(false);
+  const [userName, setUserName] = useState("Aya");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("nm_user_name") || "Aya";
+    setUserName(stored);
+    if (stored !== "Aya") {
+      setChores((prev) =>
+        prev.map((c) =>
+          c.assignee === "Aya (you)" ? { ...c, assignee: `${stored} (you)` } : c
+        )
+      );
+    }
+  }, []);
+
+  const youKey = `${userName} (you)`;
+  const memberStyles: Record<string, { bg: string; color: string; initials: string }> = {
+    [youKey]: {
+      bg: "#F0DDD3",
+      color: "#8B4A2E",
+      initials: userName.slice(0, 2).toUpperCase(),
+    },
+    ...BASE_STYLES,
+  };
 
   const done = chores.filter((c) => c.done).length;
   const total = chores.length;
@@ -163,16 +189,12 @@ export default function ChoresPage() {
               {done} <span className="text-nm-muted font-sans text-[1rem]">of {total} done</span>
             </div>
           </div>
-          <div
-            className="text-right text-[12px] text-nm-muted"
-            style={{ lineHeight: "1.5" }}
-          >
+          <div className="text-right text-[12px] text-nm-muted" style={{ lineHeight: "1.5" }}>
             <div>Resets Monday</div>
             <div style={{ color: "#4A7C5F" }}>in 4 days</div>
           </div>
         </div>
 
-        {/* Progress */}
         <div className="h-2 rounded-full overflow-hidden" style={{ background: "#F5F0E8" }}>
           <div
             className="h-2 rounded-full transition-all duration-500"
@@ -216,8 +238,12 @@ export default function ChoresPage() {
       {/* Chore cards */}
       <div className="space-y-2.5">
         {chores.map((chore) => {
-          const isYours = chore.assignee === "Aya (you)";
-          const s = MEMBER_STYLES[chore.assignee] || { bg: "#E7E3DE", color: "#6B6560", initials: chore.assignee.slice(0, 2).toUpperCase() };
+          const isYours = chore.assignee === youKey;
+          const s = memberStyles[chore.assignee] ?? {
+            bg: "#E7E3DE",
+            color: "#6B6560",
+            initials: chore.assignee.slice(0, 2).toUpperCase(),
+          };
 
           return (
             <div
@@ -229,7 +255,6 @@ export default function ChoresPage() {
                 opacity: chore.done ? 0.7 : 1,
               }}
             >
-              {/* Checkbox */}
               <button
                 onClick={() => toggle(chore.id)}
                 disabled={!isYours}
@@ -248,7 +273,6 @@ export default function ChoresPage() {
                 )}
               </button>
 
-              {/* Name */}
               <div className="flex-1 min-w-0">
                 <span
                   className="text-[16px]"
@@ -266,7 +290,6 @@ export default function ChoresPage() {
                 )}
               </div>
 
-              {/* Assignee avatar */}
               {!manageMode ? (
                 <div className="flex items-center gap-2 flex-shrink-0">
                   <div
@@ -313,7 +336,12 @@ export default function ChoresPage() {
       </div>
 
       {showAddModal && (
-        <AddChoreModal onClose={() => setShowAddModal(false)} onAdd={addChore} />
+        <AddChoreModal
+          youKey={youKey}
+          memberStyles={memberStyles}
+          onClose={() => setShowAddModal(false)}
+          onAdd={addChore}
+        />
       )}
     </div>
   );

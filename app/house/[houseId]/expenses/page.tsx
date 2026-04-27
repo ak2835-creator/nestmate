@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Expense {
   id: number;
@@ -21,13 +21,21 @@ const INITIAL_EXPENSES: Expense[] = [
   { id: 5, desc: "Dish rack", paidBy: "You", split: "split 3 ways", amount: 8.0 },
 ];
 
-function AddExpenseModal({ onClose, onAdd }: { onClose: () => void; onAdd: (e: Expense) => void }) {
+function AddExpenseModal({
+  userName,
+  onClose,
+  onAdd,
+}: {
+  userName: string;
+  onClose: () => void;
+  onAdd: (e: Expense) => void;
+}) {
   const [desc, setDesc] = useState("");
   const [amount, setAmount] = useState("");
-  const [paidBy, setPaidBy] = useState("You");
+  const [paidBy, setPaidBy] = useState(userName);
   const [split, setSplit] = useState("split 3 ways");
 
-  const isCredit = paidBy === "You";
+  const isCredit = paidBy === userName;
   const parsedAmount = parseFloat(amount) || 0;
   const perPerson = split === "split 3 ways" ? parsedAmount / 3 : split === "split 2 ways" ? parsedAmount / 2 : parsedAmount;
 
@@ -102,7 +110,7 @@ function AddExpenseModal({ onClose, onAdd }: { onClose: () => void; onAdd: (e: E
               Who paid?
             </label>
             <div className="grid grid-cols-3 gap-2">
-              {["You", "Jordan", "Priya"].map((p) => (
+              {[userName, "Jordan", "Priya"].map((p) => (
                 <button
                   key={p}
                   onClick={() => setPaidBy(p)}
@@ -146,8 +154,8 @@ function AddExpenseModal({ onClose, onAdd }: { onClose: () => void; onAdd: (e: E
           {parsedAmount > 0 && (
             <div className="rounded-xl p-3.5" style={{ background: "#F5F0E8" }}>
               <p className="text-[13px] text-nm-muted">
-                {paidBy === "You"
-                  ? `You paid $${parsedAmount.toFixed(2)}. Each of the other ${split === "split 3 ways" ? "2 people owes" : "person owes"} you $${perPerson.toFixed(2)}.`
+                {isCredit
+                  ? `${userName} paid $${parsedAmount.toFixed(2)}. Each of the other ${split === "split 3 ways" ? "2 people owes" : "person owes"} you $${perPerson.toFixed(2)}.`
                   : `${paidBy} paid. You owe $${Math.abs(perPerson).toFixed(2)}.`}
               </p>
             </div>
@@ -276,6 +284,17 @@ function ExpenseCard({
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>(INITIAL_EXPENSES);
   const [showModal, setShowModal] = useState(false);
+  const [userName, setUserName] = useState("Aya");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("nm_user_name") || "Aya";
+    setUserName(stored);
+    if (stored !== "Aya") {
+      setExpenses((prev) =>
+        prev.map((e) => (e.paidBy === "You" ? { ...e, paidBy: stored } : e))
+      );
+    }
+  }, []);
 
   const active = expenses.filter((e) => !e.settled);
   const settled = expenses.filter((e) => e.settled);
@@ -403,7 +422,7 @@ export default function ExpensesPage() {
       </p>
 
       {showModal && (
-        <AddExpenseModal onClose={() => setShowModal(false)} onAdd={addExpense} />
+        <AddExpenseModal userName={userName} onClose={() => setShowModal(false)} onAdd={addExpense} />
       )}
     </div>
   );
