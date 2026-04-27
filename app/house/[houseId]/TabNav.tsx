@@ -2,20 +2,29 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 
-const TABS = [
-  { label: "Agreement", segment: "agreement" },
-  { label: "House Board", segment: "board" },
-  { label: "Expenses", segment: "expenses" },
-  { label: "Chores", segment: "chores" },
+const ALL_TABS = [
+  { label: "Agreement", segment: "agreement", minSize: 0 },
+  { label: "House Board", segment: "board", minSize: 3 },
+  { label: "Expenses", segment: "expenses", minSize: 0 },
+  { label: "Chores", segment: "chores", minSize: 0 },
 ];
 
 export function TabNav({ houseId }: { houseId: string }) {
   const pathname = usePathname();
+  const [houseSize, setHouseSize] = useState(3);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("nm_house_size");
+    if (stored) setHouseSize(parseInt(stored, 10));
+  }, []);
+
+  const tabs = ALL_TABS.filter((t) => houseSize >= t.minSize);
 
   return (
     <div className="flex overflow-x-auto" style={{ borderTop: "1px solid rgba(44,36,22,0.08)" }}>
-      {TABS.map(({ label, segment }) => {
+      {tabs.map(({ label, segment }) => {
         const href = `/house/${houseId}/${segment}`;
         const active = pathname === href || pathname.startsWith(href + "/");
         return (
