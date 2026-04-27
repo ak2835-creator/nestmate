@@ -63,11 +63,13 @@ const INITIAL_POSTS: Post[] = [
 function NewPostModal({
   onClose,
   onSubmit,
+  initialType = "Share",
 }: {
   onClose: () => void;
   onSubmit: (post: Omit<Post, "id" | "time">) => void;
+  initialType?: PostType;
 }) {
-  const [type, setType] = useState<PostType>("Share");
+  const [type, setType] = useState<PostType>(initialType);
   const [text, setText] = useState("");
   const [category, setCategory] = useState("");
   const [location, setLocation] = useState("");
@@ -358,6 +360,12 @@ function PostCard({
 export default function BoardPage() {
   const [posts, setPosts] = useState<Post[]>(INITIAL_POSTS);
   const [showModal, setShowModal] = useState(false);
+  const [modalInitialType, setModalInitialType] = useState<PostType>("Share");
+
+  function openModal(initialType: PostType = "Share") {
+    setModalInitialType(initialType);
+    setShowModal(true);
+  }
 
   function addPost(post: Omit<Post, "id" | "time">) {
     setPosts((prev) => [{ ...post, id: Date.now(), time: "just now" }, ...prev]);
@@ -377,7 +385,7 @@ export default function BoardPage() {
     <div className="p-4 pb-24 space-y-3">
       {/* New post prompt */}
       <button
-        onClick={() => setShowModal(true)}
+        onClick={() => openModal("Share")}
         className="w-full text-left px-5 py-4 rounded-2xl transition-colors"
         style={{ background: "#FFFDFB", border: "1px dashed rgba(196,113,74,0.4)" }}
       >
@@ -412,6 +420,25 @@ export default function BoardPage() {
         </div>
       )}
 
+      {/* Concern template callout — only when no open concerns */}
+      {openConcerns === 0 && (
+        <div
+          className="rounded-2xl p-4"
+          style={{ background: "#FFFDFB", border: "1px solid rgba(44,36,22,0.08)" }}
+        >
+          <p className="text-[14px] text-nm-ink leading-relaxed mb-3">
+            💬 Something bothering you? The Concern template turns &quot;you never do your dishes&quot; into a non-accusatory message your housemates can actually hear.
+          </p>
+          <button
+            onClick={() => openModal("Concern")}
+            className="text-[13px] font-medium px-3.5 py-2 rounded-xl transition-colors"
+            style={{ background: "#F0DDD3", color: "#8B4A2E" }}
+          >
+            Try the Concern template →
+          </button>
+        </div>
+      )}
+
       {/* Feed */}
       {posts.map((post) => (
         <PostCard
@@ -423,7 +450,11 @@ export default function BoardPage() {
       ))}
 
       {showModal && (
-        <NewPostModal onClose={() => setShowModal(false)} onSubmit={addPost} />
+        <NewPostModal
+          onClose={() => setShowModal(false)}
+          onSubmit={addPost}
+          initialType={modalInitialType}
+        />
       )}
     </div>
   );
