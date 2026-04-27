@@ -1,4 +1,5 @@
 import { TabNav } from "./TabNav";
+import HouseHeader from "./HouseHeader";
 
 export default async function HouseLayout({
   children,
@@ -14,12 +15,7 @@ export default async function HouseLayout({
       {/* House header */}
       <div className="bg-nm-white" style={{ borderBottom: "1px solid rgba(44,36,22,0.1)" }}>
         <div className="px-5 pt-4 pb-0 flex items-start justify-between">
-          <div>
-            <h1 className="font-serif text-[1.35rem] font-medium text-nm-ink leading-tight">
-              312 Linden
-            </h1>
-            <p className="text-[12px] text-nm-muted mt-0.5">3 residents · move-in Aug 2026</p>
-          </div>
+          <HouseHeader />
           <div
             className="text-[12px] font-medium px-2.5 py-1 rounded-full mt-0.5"
             style={{ background: "#D8EBE0", color: "#4A7C5F" }}
