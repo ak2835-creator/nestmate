@@ -6,6 +6,11 @@ import { useState } from "react";
 
 const ROOMMATE_COUNTS = ["2 total", "3 total", "4 total", "5+ total"];
 
+function parsedHouseSize(count: string): number {
+  if (count === "5+ total") return 5;
+  return parseInt(count, 10);
+}
+
 function StepDots({ total, current }: { total: number; current: number }) {
   return (
     <div className="flex gap-1.5 mb-7">
@@ -34,8 +39,11 @@ export default function CreateHousePage() {
 
   function handleContinue() {
     if (step === 0 && canAdvanceStep0) {
+      localStorage.setItem("nm_user_name", yourName.trim());
+      localStorage.setItem("nm_house_name", houseName.trim());
       setStep(1);
     } else if (step === 1) {
+      localStorage.setItem("nm_house_size", String(parsedHouseSize(roommateCount)));
       router.push("/onboarding/agreement");
     }
   }
