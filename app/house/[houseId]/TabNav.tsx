@@ -9,6 +9,7 @@ const ALL_TABS = [
   { label: "House Board", segment: "board", minSize: 3 },
   { label: "Expenses", segment: "expenses", minSize: 0 },
   { label: "Chores", segment: "chores", minSize: 0 },
+  { label: "Pulse", segment: "pulse", minSize: 3 },
 ];
 
 export function TabNav({ houseId }: { houseId: string }) {
