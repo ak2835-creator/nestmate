@@ -61,6 +61,15 @@ export default function LoginPage() {
         >
           Log in
         </button>
+        <button
+          onClick={() => router.push("/house/demo")}
+          className="w-full py-3.5 rounded-xl font-medium text-[15px] transition-colors"
+          style={{ border: "1px solid rgba(44,36,22,0.15)", color: "#7A7165", background: "transparent" }}
+          onMouseEnter={(e) => (e.currentTarget.style.background = "#F5F0E8")}
+          onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+        >
+          → Jump to demo house
+        </button>
         <div className="text-center">
           <Link
             href="/onboarding/create"
