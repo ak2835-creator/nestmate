@@ -26,7 +26,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${lora.variable} ${dmSans.variable}`}>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen bg-nm-sand">
+        <div className="max-w-[430px] mx-auto min-h-screen bg-nm-cream shadow-[0_0_40px_rgba(0,0,0,0.08)]">
+          {children}
+        </div>
+      </body>
     </html>
   );
 }
