@@ -1,5 +1,6 @@
 import { TabNav } from "./TabNav";
 import HouseHeader from "./HouseHeader";
+import ResetDemo from "./ResetDemo";
 
 export default async function HouseLayout({
   children,
@@ -24,6 +25,10 @@ export default async function HouseLayout({
       <main className="flex-1 overflow-y-auto">
         {children}
       </main>
+
+      <div className="flex justify-center py-4">
+        <ResetDemo />
+      </div>
     </div>
   );
 }
